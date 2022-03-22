@@ -60,8 +60,8 @@ jobs:
 
       - name: Render site
         run: |
-          rmarkdown::render_site()
-        shell: Rscript {0}
+          RMD_PATH=($(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '[.]Rmd$')) || echo "No files to render."
+          Rscript -e 'for (f in commandArgs(TRUE)) if (file.exists(f)) rmarkdown::render_site(f)' ${RMD_PATH[*]}
 
       - name: Deploy 🚀
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
